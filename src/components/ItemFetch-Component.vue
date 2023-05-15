@@ -5,6 +5,7 @@
           <th>Item ID</th>
           <th></th>
           <th>Item Name</th>
+          <th>Details</th>
           <th>Item Rarity</th>
           <th>API Link</th>
         </tr>
@@ -17,6 +18,7 @@
             <span v-else>Item Icon Unavailable</span>
           </td>
           <td>{{ itemNames[itemId] }}</td>
+          <td>{{ itemDetails[itemId] }}</td>
           <td>{{ itemRarity[itemId] }}</td>
           <td>
             <a :href="getAPILink(itemId)" target="_blank">API Link</a>
@@ -53,6 +55,7 @@ export default {
       itemIconUrls: {},
       itemNames: {},
       itemRarity: {},
+      itemDetails: {},
       loading: false,
       error: null,
     };
@@ -63,13 +66,14 @@ export default {
   methods: {
     fetchItemIds() {
       this.loading = true;
-      fetch('https://api.guildwars2.com/v2/items?page=0&page_size=200')
+      fetch('https://api.guildwars2.com/v2/items?page=0&page_size=100')
         .then((response) => response.json())
         .then((data) => {
           this.itemIds = data.map((item) => item.id);
           this.fetchItemIconUrls();
           this.fetchItemNames();
           this.fetchItemRarity();
+          this.fetchItemDetails();
           this.loading = false;
         })
         .catch((error) => {
@@ -134,6 +138,24 @@ export default {
           .catch((error) => {
             console.error('Error:' , error);
           });
+      });
+    },
+    fetchItemDetails() {
+      this.itemIds.forEach((id) => {
+        fetch(`http://api.guildwars2.com/v2/items/${id}?lang=en&v=latest`)
+        .then((response) => response.json())
+        .then((data) => {
+          const itemDetails = data.details;
+          let formattedDetails = '';
+          for (const prop in itemDetails) {
+            formattedDetails += `\n${prop}: ${itemDetails[prop]};`;
+          }
+
+          this.itemDetails[id] = formattedDetails;
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
       });
     },
     getAPILink(itemId) {
