@@ -1,5 +1,11 @@
 # vue-item-display
 
+## Project Info
+```
+This is a basic example that aims to show how you can use Vue.js to fetch information from a public video game API database of each item
+it displays their "id", "icon", "rarity" and link to the API
+```
+
 ## Project setup
 ```
 npm install
